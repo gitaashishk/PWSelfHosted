@@ -3,23 +3,14 @@ name: Playwright Tests
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          path: .  # ✅ ensures the repo is checked out directly into the runner working directory
-
-      - name: Show directory structure (debug)
-        run: |
-          echo "GitHub Actions current directory: $PWD"
-          ls -la
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -35,9 +26,12 @@ jobs:
       - name: Run Playwright Tests
         run: npx playwright test
 
-      - name: Upload Playwright HTML Report
+      - name: Generate Allure Report
+        run: npx allure generate allure-results --clean -o allure-report
+
+      - name: Upload Allure Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report
-          path: reports/html
+          name: allure-report
+          path: allure-report
